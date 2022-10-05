@@ -28,7 +28,7 @@ $errorActionPreference = "Stop"
 $WarningPreference = 'SilentlyContinue'
 trap {$errmsg = ($_ | format-list * -force | out-string) ; "TRAP CALLED at $(Get-Date) : $errmsg" ; break}  # Error: $_ and Exception: $_.Exception.Message and 
 
-# $GLOBAL:DebugPreference = "Continue"  # comment out in order to NOT get debug output
+# $GLOBAL:DebugPreference = "Continue"  # comment out in order to NOT get debug output 
 $workingDirectory = Join-Path -Path $pwd -ChildPath "posh-acme"
 $poshcontainer = "posh-acme"
 $poshfile = "posh-acme.zip"
