@@ -22,6 +22,9 @@ param (
   [string] $acme_rg,
   
   [Parameter(Mandatory = $true)]
+  [string]$PAServer,
+
+  [Parameter(Mandatory = $true)]
   [string]$ACMEDNSDomain
   )    
 $errorActionPreference = "Stop"
@@ -42,7 +45,7 @@ else {
   }
 }
 
-$PAServer  = Get-AutomationVariable -Name 'PAServer'
+# $PAServer  = Get-AutomationVariable -Name 'PAServer'
 $WriteLock = Get-AutomationVariable -Name 'WriteLock'
 #endregion
 
@@ -110,8 +113,9 @@ finally {
 Return
 
 
-#test-run of this runbook in powershell, you must be in the directoy where this scriptfile resides. set variables beforehand, f.e $domains = @("vrep-int.finma.ch", "vrep.finma.ch") ; $ACMEDNSDomain = "acme.finma.ch" ; $acme_rg = "vrep-prod-chn-rg03" ; $automation_account_name = "vrep-prod-chn-atm02" ; $acme_kv = "acme-kv01" ; $s_acc_name = "vrepprodchn02" ; $location = "Switzerlandnorth" ; $ACMEContact = "holger.vankoll@swisscom.com" ; $PAServer = "LE_PROD"
-Get-Date; $ErrorActionPreference = 'Stop' ; $rbname = "order_or_renew_certificate_using_acme"; $rbparams = @{"domains" = $domains; "acme_rg" = $acme_rg; "ACMEDNSDomain" = $ACMEDNSDomain}
+#test-run of this runbook in powershell, you must be in the directoy where this scriptfile resides.
+#set variables beforehand, f.e $domains = @("vrep-int.finma.ch", "vrep.finma.ch") ; $ACMEDNSDomain = "acme.finma.ch" ; $acme_rg = "vrep-prod-chn-rg03" ; $automation_account_name = "vrep-prod-chn-atm02" ; $acme_kv = "acme-kv01" ; $s_acc_name = "vrepprodchn02" ; $location = "Switzerlandnorth" ; $ACMEContact = "holger.vankoll@swisscom.com" ; $PAServer = "LE_PROD"
+Get-Date; $ErrorActionPreference = 'Stop' ; $rbname = "order_or_renew_certificate_using_acme"; $rbparams = @{"domains" = $domains; "acme_rg" = $acme_rg; "ACMEDNSDomain" = $ACMEDNSDomain ; PAServer = $PAServer }
 $null = Import-AzAutomationRunbook -Name $rbname -Path .\order_or_renew_certificate_using_acme.ps1 -ResourceGroup $acme_rg -AutomationAccountName $automation_account_name -Type PowerShell -Force -Published
 $rb_out = Start-AzAutomationRunbook -Name $rbname -ResourceGroupName $acme_rg -AutomationAccountName $automation_account_name -Parameters $rbparams
 do { $x = (Get-AzAutomationJob -Id $rb_out.JobId.Guid -ResourceGroupName $acme_rg -AutomationAccountName $automation_account_name) ; Start-Sleep -Seconds 10 } until ( $x.Status.Equals("Failed") -OR $x.Status.Equals("Completed") )
