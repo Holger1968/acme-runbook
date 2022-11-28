@@ -90,18 +90,18 @@ try {
         AZSubscriptionId = $az.Context.Subscription.Id
         AZAccessToken = (Get-AzAccessToken -ResourceUrl "https://management.core.windows.net/" -TenantId $az.Context.Tenant ).Token
       }
-      $cert = New-PACertificate $domains[$i] -DnsAlias $ACMEDNSDomain -PfxPass $pfxpwd -Plugin Azure -PluginArgs $pArgs -AcceptTOS #-Force # FIXME force raus
+      $cert = New-PACertificate $domains[$i] -DnsAlias $ACMEDNSDomain -PfxPass $pfxpwd -Plugin Azure -PluginArgs $pArgs -AcceptTOS 
       if ($cert) { "Created new certificate : $cert" } else { throw "New-PACertificate did not fail, but variable cert is empty - ERROR" }
     }
     else {
-      $cert = Submit-Renewal $domains[$i] # -Force # FIXME force raus
+      $cert = Submit-Renewal $domains[$i]
       if ($cert) { "Renewed certificate : $cert" } else { "No renewal done." }
     }
     if ($cert) {
-      "$cert is " + $cert + $cert.PfxFile
+      "$cert is " + $cert + $cert.FullChainFile
       $certname = $domains[$i] -replace ('\.',"") -replace ('[^a-zA-Z0-9-]', '')
       "Uploading cert $certname to keyvault $kv_name"
-      $null = Import-AzKeyVaultCertificate -VaultName $kv_name -Name $certname -FilePath $cert.PfxFile -Password $cert.PfxPass
+      $null = Import-AzKeyVaultCertificate -VaultName $kv_name -Name $certname -FilePath $cert.FullChainFile -Password $cert.PfxPass
     }
   }
 }
@@ -126,4 +126,3 @@ $fname = "$env:TEMP\jobout_exception.txt"
 if ( $null -ne $joboutput_sum ) { "joboutput_sum is : " ; $joboutput_sum } ; if ($x.Status.Equals("Failed")) { Write-Host -NoNewline -ForegroundColor Red -BackgroundColor Black "Job Failed! Error details in `$joboutput.Values and in $fname (`$fname)" ; Out-File -InputObject $joboutput.Values -FilePath $fname -ErrorAction SilentlyContinue }
 # Get-Content -Tail 30 $fname
 [console]::beep(500,800)
-
