@@ -98,10 +98,10 @@ try {
       if ($cert) { "Renewed certificate : $cert" } else { "No renewal done." }
     }
     if ($cert) {
-      "$cert is " + $cert + $cert.FullChainFile
+      "$cert is " + $cert + $cert.PfxFullChain
       $certname = $domains[$i] -replace ('\.',"") -replace ('[^a-zA-Z0-9-]', '')
       "Uploading cert $certname to keyvault $kv_name"
-      $null = Import-AzKeyVaultCertificate -VaultName $kv_name -Name $certname -FilePath $cert.FullChainFile -Password $cert.PfxPass
+      $null = Import-AzKeyVaultCertificate -VaultName $kv_name -Name $certname -FilePath $cert.PfxFullChain -Password $cert.PfxPass
     }
   }
 }
